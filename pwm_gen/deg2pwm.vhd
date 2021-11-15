@@ -2,7 +2,7 @@ LIBRARY ieee;
 USE ieee.numeric_std.ALL;
 USE ieee.std_logic_1164.ALL;
 
-entity s_tester is
+entity deg2pwm is
   	--clk_deg : time := 5.5 us;
 	--pwm_period : time := 20 ms;
 	--pwmmin : time := 1 ms);
@@ -12,11 +12,11 @@ entity s_tester is
 	     S_OUT   : out std_logic; 
 	     IN_D    : in unsigned(7 downto 0)
 	     );
-end s_tester;
+end deg2pwm;
 --clk is 100kHz
 --553-2520?sec pwm
 
-architecture behaviour of s_tester is
+architecture behaviour of deg2pwm is
 	--signals etc;
 	--min pwm 553us
 	--Counter from (553)+(0-1987us) (ver2. 569-...)
