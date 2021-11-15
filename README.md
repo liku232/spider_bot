@@ -1,2 +1,2 @@
 # spider_bot
-Let a servo bsed spider-bot walk using a DE10lite board and a raspberry pi
+Let a servo based spider-bot walk, using a DE10lite and a raspberry pi
