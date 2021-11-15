@@ -1,0 +1,43 @@
+------------------------------------------------------------------------------------
+--Project : DIC 4AHEL 
+--Author  : Gräbner
+--Date    : 15/09/2020
+--File    : DE10_Lite.vhd
+--Design  : Terasic DE10 Board
+------------------------------------------------------------------------------------
+-- Description: Button Up/Down Counter, HEX
+------------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.ALL;
+use ieee.numeric_std.ALL;
+
+use work.DE10_Lite_const_pkg.ALL;
+
+--=======================================================================================================
+entity DE10_Lite is
+  port (
+        MAX10_CLK1_50 :  in std_logic;
+        ---------------------------------------------------------------
+        CLK_out       :  out std_logic;
+        ---------------------------------------------------------------
+       );
+end DE10_Lite;
+--=======================================================================================================
+
+architecture rtl of DE10_Lite is
+
+signal clk_inp : std_logic;
+signal clk_out : std_logic;
+
+begin
+
+  smy_clk-div: entity work.clock_divider(rtl) 
+                                             port map (
+                                                       CLK        => CLK,
+                                                       clk_in  => clk_inp,
+                                                       clk_out => clk_out
+                                                      );
+  clk_inp <= max10_clk1_50;
+  clk_out <= pad_out[0:0]
+end rtl;
+--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
