@@ -1,4 +1,4 @@
-LIBRARY ieee;
+LIBRARY ieee; --penis
 USE ieee.numeric_std.ALL;
 USE ieee.std_logic_1164.ALL;
 
