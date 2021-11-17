@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------------
 --Project : DIC 4AHEL 
---Author  : Gr�bner
+--Author  : Menzel
 --Date    : 15/09/2020
 --File    : DE10_Lite.vhd
 --Design  : Terasic DE10 Board
@@ -18,7 +18,9 @@ entity DE10_Lite is
   port (
       MAX10_CLK1_50 : in std_logic;
       ---------------------------------------------------------------
-		GPIO		  :	in std_logic_vector (23 downto 0);
+		LEDR			  : out std_logic_vector(9 downto 0);
+		---------------------------------------------------------------
+		GPIO		  :	inout std_logic_vector (34 downto 0);
 		---------------------------------------------------------------
 		SW            : in std_logic_vector(9 downto 0)
     );
@@ -47,9 +49,9 @@ begin
 	port map (
 		MOSI => mosi,
 		MISO => miso,
-		sckl => sclk,
+		sclk => sclk,
 		ss => ss,
-		reset_n => reset_n,
+		reset_n => sw(0),
 		servo_out => spi_in
 	);
 
@@ -64,7 +66,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(20),
-		IN_D => spi_in(191 downto 184)
+		IN_D => unsigned(spi_in(191 downto 184))
 	);
 	
 	servo2: entity work.s_tester(behaviour)
@@ -72,7 +74,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(1),
-		IN_D => spi_in(183 downto 176)
+		IN_D => unsigned(spi_in(183 downto 176))
 	);
 	
 	servo3: entity work.s_tester(behaviour)
@@ -80,7 +82,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(2),
-		IN_D => spi_in(175 downto 168)
+		IN_D => unsigned(spi_in(175 downto 168))
 	);
 	
 	
@@ -89,7 +91,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(3),
-		IN_D => spi_in(167 downto 160)
+		IN_D => unsigned(spi_in(167 downto 160))
 	);
 	
 	servo5: entity work.s_tester(behaviour)
@@ -97,7 +99,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(4),
-		IN_D => spi_in(159 downto 152)
+		IN_D => unsigned(spi_in(159 downto 152))
 	);
 	
 	servo6: entity work.s_tester(behaviour)
@@ -105,7 +107,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(5),
-		IN_D => spi_in(151 downto 144)
+		IN_D => unsigned(spi_in(151 downto 144))
 	);
 	
 	servo7: entity work.s_tester(behaviour)
@@ -113,7 +115,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(6),
-		IN_D => spi_in(143 downto 136)
+		IN_D => unsigned(spi_in(143 downto 136))
 	);
 	
 	servo8: entity work.s_tester(behaviour)
@@ -121,18 +123,19 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(7),
-		IN_D => spi_in(135 downto 128)
+		IN_D => unsigned(spi_in(135 downto 128))
 	);
 	
 	
   clk_inp <= max10_clk1_50;
-  servo1_pos <= unsigned(counter_nat);
   servo1_pos_vector <= SW (7 downto 0);
   GPIO(23 downto 0) <= servo_out(23 downto 0);
-  GPIO(24) <= mosi;
-  miso <= GPIO(25);
-  GPIO(26) <= ss;
-  GPIO(27) <= sclk;
+  mosi <= GPIO(24);
+  GPIO(25) <= miso;
+  ss <= GPIO(26);
+  sclk <= GPIO(27);
+  LEDR(7 downto 0) <= spi_in(7 downto 0);
+  
 
 end rtl;
 --@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
