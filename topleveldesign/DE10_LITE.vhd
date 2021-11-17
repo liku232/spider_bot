@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------------
 --Project : DIC 4AHEL 
---Author  : Gr�bner
+--Author  : Menzel
 --Date    : 15/09/2020
 --File    : DE10_Lite.vhd
 --Design  : Terasic DE10 Board
@@ -16,13 +16,14 @@ use work.DE10_Lite_const_pkg.ALL;
 --=======================================================================================================
 entity DE10_Lite is
   port (
-        MAX10_CLK1_50 :  in std_logic;
-        ---------------------------------------------------------------
-        ---------------------------------------------------------------
-		  GPIO			 :	 inout std_logic_vector (35 downto 0);
-		  ---------------------------------------------------------------
-		  SW            :  in std_logic_vector(9 downto 0)
-       );
+      MAX10_CLK1_50 : in std_logic;
+      ---------------------------------------------------------------
+		LEDR			  : out std_logic_vector(9 downto 0);
+		---------------------------------------------------------------
+		GPIO		  :	inout std_logic_vector (34 downto 0);
+		---------------------------------------------------------------
+		SW            : in std_logic_vector(9 downto 0)
+    );
 end DE10_Lite;
 --=======================================================================================================
 
@@ -34,25 +35,30 @@ signal servo_out : std_logic_vector(35 downto 0);
 signal servo1_pos : unsigned(7 downto 0);
 signal servo1_pos_vector : std_logic_vector(7 downto 0);
 signal servo_trtl: std_logic_vector(1 downto 0);
-
-  signal counter_nat       : unsigned(7 downto 0);
-
+signal spi_in: std_logic_vector(191 downto 0);
+signal counter_nat       : unsigned(7 downto 0);
+signal reset_n : std_logic;
+signal mosi    : std_logic;
+signal miso    : std_logic;
+signal sclk    : std_logic := '1';
+signal ss      : std_logic := '0';
 
 begin
 
-    rot_enc: entity work.rotary_encoder(rtl)
-    port map(
-    I=> GPIO(12)&GPIO(13),
-	 O=> servo_trtl(1 downto 0),
-	 RESET_n => '0',
-	 CLK => clk_inp
-
-    );
+	spi_receive: entity work.spi_slave(rtl)
+	port map (
+		MOSI => mosi,
+		MISO => miso,
+		sclk => sclk,
+		ss => ss,
+		reset_n => sw(0),
+		servo_out => spi_in
+	);
 
     my_clk_div: entity work.clock_divider(behaviour) 
 	port map (
 		clk_in  => clk_inp,
-      clk_servo => clk_out_sig
+    	clk_servo => clk_out_sig
     );
 	
 	servo1: entity work.s_tester(behaviour)
@@ -60,7 +66,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(20),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(191 downto 184))
 	);
 	
 	servo2: entity work.s_tester(behaviour)
@@ -68,7 +74,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(1),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(183 downto 176))
 	);
 	
 	servo3: entity work.s_tester(behaviour)
@@ -76,7 +82,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(2),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(175 downto 168))
 	);
 	
 	
@@ -85,7 +91,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(3),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(167 downto 160))
 	);
 	
 	servo5: entity work.s_tester(behaviour)
@@ -93,7 +99,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(4),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(159 downto 152))
 	);
 	
 	servo6: entity work.s_tester(behaviour)
@@ -101,7 +107,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(5),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(151 downto 144))
 	);
 	
 	servo7: entity work.s_tester(behaviour)
@@ -109,7 +115,7 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(6),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(143 downto 136))
 	);
 	
 	servo8: entity work.s_tester(behaviour)
@@ -117,25 +123,19 @@ begin
 		CLK => clk_out_sig,
 		RESET_n => '0',
 		S_OUT => servo_out(7),
-		IN_D => servo1_pos
+		IN_D => unsigned(spi_in(135 downto 128))
 	);
-	
-	counter: process(max10_clk1_50)
-	begin
-	if(max10_clk1_50'event and max10_clk1_50 = '1') then
-		if(servo_trtl = "01") then
-			counter_nat <= counter_nat + 1;
-		end if;
-		if(servo_trtl = "10") then
-			counter_nat <= counter_nat - 1;
-		end if;
-	end if;
-	end process counter;
 	
 	
   clk_inp <= max10_clk1_50;
-  servo1_pos <= unsigned(counter_nat);
- -- servo1_pos_vector <= SW (7 downto 0);
-  GPIO <= servo_out;
+  servo1_pos_vector <= SW (7 downto 0);
+  GPIO(23 downto 0) <= servo_out(23 downto 0);
+  mosi <= GPIO(24);
+  GPIO(25) <= miso;
+  ss <= GPIO(26);
+  sclk <= GPIO(27);
+  LEDR(7 downto 0) <= spi_in(7 downto 0);
+  
+
 end rtl;
 --@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
