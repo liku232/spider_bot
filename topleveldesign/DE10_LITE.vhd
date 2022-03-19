@@ -44,7 +44,15 @@ signal sclk    : std_logic := '1';
 signal ss      : std_logic := '0';
 
 begin
-
+	clk_inp <= max10_clk1_50;
+	servo1_pos_vector <= SW (7 downto 0);
+	GPIO(31 downto 8) <= servo_out(23 downto 0);
+	mosi <= GPIO(4);
+	GPIO(2) <= miso;
+	ss <= GPIO(6);
+	sclk <= GPIO(0);
+	LEDR(7 downto 0) <= spi_in(191 downto 184);
+  
 	spi_receive: entity work.spi_slave(rtl)
 	port map (
 		MOSI => mosi,
@@ -55,87 +63,27 @@ begin
 		servo_out => spi_in
 	);
 
-    my_clk_div: entity work.clock_divider(behaviour) 
+	my_clk_div: entity work.clock_divider(behaviour) 
 	port map (
 		clk_in  => clk_inp,
     	clk_servo => clk_out_sig
     );
 	
-	servo1: entity work.s_tester(behaviour)
+	SERVOGEN: for I in 23 downto 0 generate
+	ELEMENT: entity work.s_tester(behaviour)
 	port map (
 		CLK => clk_out_sig,
 		RESET_n => '0',
-		S_OUT => servo_out(20),
-		IN_D => unsigned(spi_in(191 downto 184))
+		S_OUT => servo_out(I),
+		IN_D(0) => spi_in(8*I + 7),
+		IN_D(1) => spi_in(8*I + 6),
+		IN_D(2) => spi_in(8*I + 5),
+		IN_D(3) => spi_in(8*I + 4),
+		IN_D(4) => spi_in(8*I + 3),
+		IN_D(5) => spi_in(8*I + 2),
+		IN_D(6) => spi_in(8*I + 1),
+		IN_D(7) => spi_in(8*I + 0)
 	);
-	
-	servo2: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(1),
-		IN_D => unsigned(spi_in(183 downto 176))
-	);
-	
-	servo3: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(2),
-		IN_D => unsigned(spi_in(175 downto 168))
-	);
-	
-	
-	servo4: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(3),
-		IN_D => unsigned(spi_in(167 downto 160))
-	);
-	
-	servo5: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(4),
-		IN_D => unsigned(spi_in(159 downto 152))
-	);
-	
-	servo6: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(5),
-		IN_D => unsigned(spi_in(151 downto 144))
-	);
-	
-	servo7: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(6),
-		IN_D => unsigned(spi_in(143 downto 136))
-	);
-	
-	servo8: entity work.s_tester(behaviour)
-	port map (
-		CLK => clk_out_sig,
-		RESET_n => '0',
-		S_OUT => servo_out(7),
-		IN_D => unsigned(spi_in(135 downto 128))
-	);
-	
-	
-  clk_inp <= max10_clk1_50;
-  servo1_pos_vector <= SW (7 downto 0);
-  GPIO(23 downto 0) <= servo_out(23 downto 0);
-  mosi <= GPIO(24);
-  GPIO(25) <= miso;
-  ss <= GPIO(26);
-  sclk <= GPIO(27);
-  LEDR(7 downto 0) <= spi_in(7 downto 0);
-  
-
+   	end generate SERVOGEN;
 end rtl;
 --@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
